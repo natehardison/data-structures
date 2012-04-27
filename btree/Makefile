@@ -24,10 +24,10 @@ LDFLAGS =
 # In this section, you list the files that are part of the project.
 # If you add/change names of header/source files, here is where you
 # edit the Makefile.
-HEADERS = sll.h
-SOURCES = sll.c sll-test.c
-LIBRARIES = -L. -lsll
-TARGETS =  sll-test
+HEADERS = btree.h
+SOURCES = btree.c btree-test.c
+LIBRARIES = -L. -lbtree
+TARGETS =  btree-test
 LIB_TARGETS = 
 
 # The first target defined in the makefile is the one
@@ -35,7 +35,7 @@ LIB_TARGETS =
 # target makes all test programs
 default: $(TARGETS)
 
-sll-test : sll.o sll-test.o
+btree-test : btree.o btree-test.o
     $(CC) $(CFLAGS) -o $@  $^ $(LDFLAGS)
 
 

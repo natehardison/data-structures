@@ -1,3 +1,4 @@
 cvector
 cmap
 */Makefile.dependencies
+*/*-test
