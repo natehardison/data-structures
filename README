@@ -1,0 +1,5 @@
+This is just a collection of data structure implementations for fun and practice.
+
+The singly-linked list API is inspired by Nick Parlante's Linked List Problems at http://cslibrary.stanford.edu/105/LinkedListProblems.pdf, though the implementation is my own.
+
+If you're an instructor who's having trouble because this is public, please let me know. I've tried to exclude things that I know to be used as current assignments (e.g. vector, hash map).
