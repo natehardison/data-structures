@@ -2,7 +2,7 @@
  * sll-test.c
  * -----
  * Author: Nate Hardison
- * Updated: Apr 13 2012
+ * Updated: Apr 27 2012
  *
  * Implementation of some helper functions for a generic, singly-linked
  * list. Includes some interesting algorithms (reversal, cycle detection).

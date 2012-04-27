@@ -2,7 +2,7 @@
  * sll.h
  * -----
  * Author: Nate Hardison
- * Updated: Mar 15 2012
+ * Updated: Apr 27 2012
  *
  * Implementation of a generic singly linked list.
  */
@@ -13,8 +13,8 @@
 
 typedef struct
 {
-	void *next;
-	char data[];
+    void *next;
+    char data[];
 } node;
 
 typedef void (*sll_map_fn)(void *elem, void *aux_data);
