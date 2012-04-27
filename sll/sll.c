@@ -242,17 +242,10 @@ sll_reverse(node **list)
     *list = reversed_list;
 }
 
-// TODO: needs fixing
 void
 sll_reverse_recursive(node **list)
 {
-    assert(list != NULL);
 
-    if (*list == NULL) return;
-
-    node *n = sll_pop(list);
-    sll_reverse_recursive(list);
-    sll_push(list, n);
 }
 
 bool
