@@ -36,7 +36,7 @@ LIB_TARGETS =
 default: $(TARGETS)
 
 sll-test : sll.o sll-test.o
-    $(CC) $(CFLAGS) -o $@  $^ $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@  $^ $(LDFLAGS)
 
 
 # In make's default rules, a .o automatically depends on its .c file
@@ -44,7 +44,7 @@ sll-test : sll.o sll-test.o
 # The line below creates additional dependencies, most notably that it
 # will cause the .c to reocmpiled if any included .h file changes.
 Makefile.dependencies:: $(SOURCES) $(HEADERS)
-    $(CC) $(CFLAGS) -MM $(SOURCES) > Makefile.dependencies
+	$(CC) $(CFLAGS) -MM $(SOURCES) > Makefile.dependencies
 
 -include Makefile.dependencies
 
@@ -54,5 +54,5 @@ Makefile.dependencies:: $(SOURCES) $(HEADERS)
 .PHONY: clean
 
 clean:
-    @rm -f $(TARGETS) $(LIB_TARGETS) *.o core Makefile.dependencies
+	@rm -f $(TARGETS) $(LIB_TARGETS) *.o core Makefile.dependencies
 

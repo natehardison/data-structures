@@ -2,7 +2,6 @@
  * sll.h
  * -----
  * Author: Nate Hardison
- * Updated: Apr 27 2012
  *
  * Implementation of a generic singly linked list.
  */
@@ -39,19 +38,19 @@ void sll_free(node *list, sll_free_fn free_fn);
 node *sll_search(node *list, void *elem, sll_cmp_fn cmp_fn);
 size_t sll_elem_count(node *list, void *elem, sll_cmp_fn cmp_fn);
 void sll_map(node *list, sll_map_fn map_fn, void *aux_data);
-void sll_bubble_sort(node **list);
+void sll_bubble_sort(node **list, sll_cmp_fn cmp_fn);
 
-void sll_sorted_insert(node **list, node *n);
-void sll_insert_sort(node **list);
+void sll_sorted_insert(node **list, node *n, sll_cmp_fn cmp_fn);
+void sll_insert_sort(node **list, sll_cmp_fn cmp_fn);
 
 void sll_front_back_split(node *list, node **front, node **back);
 void sll_remove_duplicates(node *list, sll_cmp_fn cmp_fn);
 void sll_move_node(node **dst, node **src);
 void sll_alternating_split(node *list, node **a, node **b);
 node *sll_shuffle_merge(node *a, node *b);
-node *sll_sorted_merge(node *a, node *b);
-void sll_merge_sort(node **list);
-node *sll_sorted_intersect(node *a, node *b);
+node *sll_sorted_merge(node *a, node *b, sll_cmp_fn cmp_fn);
+void sll_merge_sort(node **list, sll_cmp_fn cmp_fn);
+node *sll_sorted_intersect(node *a, node *b, sll_cmp_fn cmp_fn);
 
 void sll_reverse(node **list);
 void sll_reverse_recursive(node **list);

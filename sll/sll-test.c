@@ -2,7 +2,6 @@
  * sll-test.c
  * -----
  * Author: Nate Hardison
- * Updated: Apr 27 2012
  *
  * Implementation of some helper functions for a generic, singly-linked
  * list. Includes some interesting algorithms (reversal, cycle detection).
@@ -123,15 +122,21 @@ test_insert_after()
 {
     printf("Testing sll_insert_after()\n--------------------------\n");
 
+    node *list = NULL;
+
+    node n, o;
+    sll_push(&list, &n);
+    sll_insert_after(&n, &o);
+
     printf("All good with sll_insert_after()!\n\n");
 }
 
 static void
 test_remove_after()
 {
-    printf("Testing sll_insert_after()\n--------------------------\n");
+    printf("Testing sll_remove_after()\n--------------------------\n");
 
-    printf("All good with sll_insert_after()!\n\n");
+    printf("All good with sll_remove_after()!\n\n");
 }
 
 static void
@@ -182,6 +187,65 @@ test_append()
     assert(list == NULL);
 
     printf("OK!\n");
+}
+
+static void
+test_ith()
+{
+    printf("Testing sll_ith()\n-----------------\n");
+
+    node *list = NULL;
+
+    printf("Ensure sll_ith() on empty list errors...");
+    //node *n = sll_ith(list, 0);
+    printf("OK!\n");
+
+    printf("Push 0-9 onto list, ensure that 3rd elem is 6...");
+    for (int i = 0; i < 10; i++) {
+        node *n = build_node(&i, sizeof(i));
+        sll_push(&list, n);
+    }
+    assert(*(int *)(sll_ith(list, 3)->data) == 6);
+    printf("OK!\n");
+
+    printf("All good with sll_ith()!\n\n");
+}
+
+static void
+test_insert_ith()
+{
+    printf("Testing sll_insert_ith()\n------------------------\n");
+
+    node *list = NULL;
+
+    int elem = 0;
+    node *zero = build_node(&elem, sizeof(elem));
+
+    elem = 1;
+    node *one = build_node(&elem, sizeof(elem));
+
+    elem = 2;
+    node *two = build_node(&elem, sizeof(elem));
+
+    sll_insert_ith(&list, zero, 0);
+    sll_insert_ith(&list, two, 1);
+    sll_insert_ith(&list, one, 1);
+
+    for (int i = 0; i <= 2; i++) {
+        assert(*(int *)(sll_ith(list, i)->data) == i);
+    }
+
+    sll_free(list, NULL);
+
+    printf("All good with sll_insert_ith()!\n\n");
+}
+
+static void
+test_remove_ith()
+{
+    printf("Testing sll_remove_ith()\n----------------\n");
+
+    printf("All good with sll_remove_ith()!\n\n");
 }
 
 static void
@@ -281,9 +345,177 @@ test_search()
 }
 
 static void
+test_elem_count()
+{
+    printf("Testing sll_elem_count()\n------------------------\n");
+
+    node *list = NULL;
+
+    // Prepend some ints to list
+    for (int i = 0; i < 10; i++) {
+        node *n = build_node(&i, sizeof(i));
+        sll_push(&list, n);
+    }
+
+    // Push all evens onto list again
+    for (int i = 0; i < 10; i += 2) {
+        node *n = build_node(&i, sizeof(i));
+        sll_push(&list, n);
+    }
+
+    // Push all multiples of 4 onto list one more time
+    for (int i = 0; i < 10; i += 4) {
+        node *n = build_node(&i, sizeof(i));
+        sll_push(&list, n);
+    }
+
+    int one = 1, six = 6, eight = 8;
+    assert(sll_elem_count(list, &one, cmp_int) == 1);
+    assert(sll_elem_count(list, &six, cmp_int) == 2);
+    assert(sll_elem_count(list, &eight, cmp_int) == 3);
+
+    sll_free(list, NULL);
+
+    printf("All good with sll_elem_count()!\n\n");
+}
+
+static void
+test_map()
+{
+    printf("Testing sll_map()\n-----------------\n");
+
+    printf("All good with sll_map()!\n\n");
+}
+
+static void
+test_bubble_sort()
+{
+    printf("Testing sll_bubble_sort()\n-------------------------\n");
+
+    printf("All good with sll_bubble_sort()!\n\n");
+}
+
+static void
+test_sorted_insert()
+{
+    printf("Testing sll_sorted_insert()\n---------------------------\n");
+    
+    node *list = NULL;
+
+    // Prepend some ints to list
+    for (int i = 0; i < 10; i++) {
+        if (i == 4) continue;
+        node *n = build_node(&i, sizeof(i));
+        sll_push(&list, n);
+    }
+
+    int i = 4;
+    node *n = build_node(&i, sizeof(i));
+    sll_sorted_insert(&list, n, cmp_int);
+
+    i = 20;
+    n = build_node(&i, sizeof(i));
+    sll_sorted_insert(&list, n, cmp_int);
+
+    i = 2;
+    n = build_node(&i, sizeof(i));
+    sll_sorted_insert(&list, n, cmp_int);    
+
+    i = 3;
+    n = build_node(&i, sizeof(i));
+    sll_sorted_insert(&list, n, cmp_int);
+
+    printf("All good with sll_sorted_insert()!\n\n");
+}
+
+static void
+test_insert_sort()
+{
+    printf("Testing sll_insert_sort()\n-------------------------\n");
+
+    node *list = NULL;
+
+    // Prepend some ints to list
+    for (int i = 0; i < 10; i++) {
+        node *n = build_node(&i, sizeof(i));
+        sll_push(&list, n);
+    }
+
+    print_list(list, print_int);
+    sll_insert_sort(&list, cmp_int);
+    print_list(list, print_int);
+
+    printf("All good with sll_insert_sort()!\n\n");
+}
+
+static void
+test_front_back_split()
+{
+    printf("Testing sll_front_back_split()\n------------------------------\n");
+
+    printf("All good with sll_front_back_split()!\n\n");
+}
+
+static void
+test_remove_duplicates()
+{
+    printf("Testing sll_remove_duplicates()\n-------------------------------\n");
+
+    printf("All good with sll_remove_duplicates()!\n\n");
+}
+
+static void
+test_move_node()
+{
+    printf("Testing sll_move_node()\n-----------------------\n");
+
+    printf("All good with sll_move_node()!\n\n");
+}
+
+static void
+test_alternating_split()
+{
+    printf("Testing sll_alternating_split()\n-------------------------------\n");
+
+    printf("All good with sll_alternating_split()!\n\n");
+}
+
+static void
+test_shuffle_merge()
+{
+    printf("Testing sll_shuffle_merge()\n---------------------------\n");
+
+    printf("All good with sll_shuffle_merge()!\n\n");
+}
+
+static void
+test_sorted_merge()
+{
+    printf("Testing sll_sorted_merge()\n--------------------------\n");
+
+    printf("All good with sll_sorted_merge()!\n\n");
+}
+
+static void
+test_merge_sort()
+{
+    printf("Testing sll_merge_sort()\n------------------------\n");
+
+    printf("All good with sll_merge_sort()!\n\n");
+}
+
+static void
+test_sorted_intersect()
+{
+    printf("Testing sll_sorted_intersect()\n------------------------------\n");
+
+    printf("All good with sll_sorted_intersect()!\n\n");
+}
+
+static void
 test_reverse()
 {
-    printf("Testing reverse...");
+    printf("Testing sll_reverse()\n---------------------\n");
 
     node *list = NULL;
 
@@ -300,6 +532,24 @@ test_reverse()
     }
 
     printf("OK!\n");
+
+    printf("All good with sll_reverse()!\n\n");
+}
+
+static void
+test_reverse_recursive()
+{
+    printf("Testing sll_reverse_recursive()\n-------------------------------\n");
+
+    printf("All good with sll_reverse_recursive()!\n\n");
+}
+
+static void
+test_has_cycle()
+{
+    printf("Testing sll_has_cycle()\n-----------------------\n");
+
+    printf("All good with sll_has_cycle()!\n\n");
 }
 
 int
@@ -314,21 +564,35 @@ main(int argc, const char *argv[])
     test_find_last();
     test_append();
 
-    //test_ith();
-    //test_insert_ith();
-    //test_remove_ith();
+    test_ith();
+    test_insert_ith();
+    test_remove_ith();
 
     test_length();
     test_free();
     test_search();
-    //test_elem_count();
-    //test_map();
-    //test_bubble_sort();
+    test_elem_count();
+    test_map();
+    test_bubble_sort();
+
+    test_sorted_insert();
+    test_insert_sort();
+
+    test_front_back_split();
+    test_remove_duplicates();
+
+    test_move_node();
+    test_alternating_split();
+
+    test_shuffle_merge();
+    test_sorted_merge();
+    test_merge_sort();
+    test_sorted_intersect();
 
     test_reverse();
-    //test_reverse_recursive();
+    test_reverse_recursive();
 
-    //test_has_cycle();
+    test_has_cycle();
 
     return 0;
 }

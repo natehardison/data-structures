@@ -2,7 +2,6 @@
  * sll.c
  * -----
  * Author: Nate Hardison
- * Updated: Apr 27 2012
  *
  * Implementation of some helper functions for a generic, singly-linked
  * list. Includes some interesting algorithms (reversal, cycle detection).
@@ -53,6 +52,7 @@ sll_remove_after(node *n)
 {
     assert(n != NULL);
 
+    // TODO: implement me!
 }
 
 /* Find the last elem of a list */
@@ -81,7 +81,9 @@ sll_append(node **list, node *n)
 node *
 sll_ith(node *list, int i)
 {
-    for (; i >= 0; i--) {
+    assert(i >= 0);
+
+    for (; i > 0; i--) {
         assert(list != NULL);
         list = list->next;
     }
@@ -92,14 +94,25 @@ sll_ith(node *list, int i)
 void
 sll_insert_ith(node **list, node *n, int i)
 {
-    node *ith = sll_ith(*list, i - 1);
-    sll_insert_after(ith, n);
+    assert(list != NULL);
+    assert(n != NULL);
+    assert(i >= 0);
+
+    if (i == 0) {
+        sll_push(list, n);
+    } else {
+        node *prev = sll_ith(*list, i - 1);
+        sll_insert_after(prev, n);
+    }
 }
 
 void
 sll_remove_ith(node **list, int i)
 {
+    assert(list != NULL);
+    assert(i >= 0);
 
+    // TODO: implement me!
 }
 
 static void
@@ -148,7 +161,7 @@ sll_elem_count(node *list, void *elem, sll_cmp_fn cmp_fn)
     size_t elem_count = 0;
 
     for (node *n = list; n != NULL; n = n->next) {
-        if (cmp_fn(n, elem) == 0) elem_count++;
+        if (cmp_fn(n->data, elem) == 0) elem_count++;
     }
 
     return elem_count;
@@ -163,27 +176,60 @@ sll_map(node *list, sll_map_fn map_fn, void *aux_data)
 }
 
 void
-sll_bubble_sort(node **list)
+sll_bubble_sort(node **list, sll_cmp_fn cmp_fn)
 {
+    assert(list != NULL);
+
+    // TODO: implement me!
+}
+
+void
+sll_sorted_insert(node **list, node *n, sll_cmp_fn cmp_fn)
+{
+    assert(list != NULL);
+    assert(n != NULL);
+    assert(cmp_fn != NULL);
+
+    node *prev = NULL;
+    for (node *cur = *list; cur != NULL; prev = cur, cur = cur->next) {
+        if (cmp_fn(cur->data, n->data) > 0) break;
+    }
+
+    if (prev == NULL) sll_push(list, n);
+    else sll_insert_after(prev, n);
 
 }
 
 void
-sll_sorted_insert(node **list, node *n)
+sll_insert_sort(node **list, sll_cmp_fn cmp_fn)
 {
+    assert(list != NULL);
+    assert(cmp_fn != NULL);
 
-}
+    node *sorted_list = NULL;
+    
+    while (*list != NULL) {
+        node *n = sll_pop(list);
+        sll_sorted_insert(&sorted_list, n, cmp_fn);
+    }
 
-void
-sll_insert_sort(node **list)
-{
-
+    *list = sorted_list;
 }
 
 void
 sll_front_back_split(node *list, node **front, node **back)
 {
+    assert(front != NULL);
+    assert(back != NULL);
 
+    size_t length = sll_length(list);
+    size_t front_length = (length / 2) + (length % 2);
+
+    *front = list;
+    node *front_end = sll_ith(list, front_length - 2);
+
+    *back = front_end->next;
+    front_end->next = NULL;
 }
 
 void
@@ -195,13 +241,23 @@ sll_remove_duplicates(node *list, sll_cmp_fn cmp_fn)
 void
 sll_move_node(node **dst, node **src)
 {
+    assert(dst != NULL);
+    assert(src != NULL);
 
+    sll_push(dst, sll_pop(src));
 }
 
 void
 sll_alternating_split(node *list, node **a, node **b)
 {
+    node **to_push = a;
 
+    while (list != NULL) {
+        sll_push(a, sll_pop(&list));
+        if (list != NULL) {
+            sll_push(b, sll_pop(&list));
+        }
+    }
 }
 
 node *
@@ -211,19 +267,19 @@ sll_shuffle_merge(node *a, node *b)
 }
 
 node *
-sll_sorted_merge(node *a, node *b)
+sll_sorted_merge(node *a, node *b, sll_cmp_fn cmp_fn)
 {
     return NULL;
 }
 
 void
-sll_merge_sort(node **list)
+sll_merge_sort(node **list, sll_cmp_fn cmp_fn)
 {
 
 }
 
 node *
-sll_sorted_intersect(node *a, node *b)
+sll_sorted_intersect(node *a, node *b, sll_cmp_fn cmp_fn)
 {
     return NULL;
 }
