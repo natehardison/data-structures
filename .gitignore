@@ -2,3 +2,4 @@ cvector
 cmap
 */Makefile.dependencies
 */*-test
+*/*.pdf
