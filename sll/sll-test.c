@@ -58,30 +58,51 @@ build_node(void *elem, size_t elem_size)
     return n;
 }
 
+static node *
+build_int_list(int start, int end)
+{
+    node *list = NULL;
+    node **last_ref = &list;
+
+    for (; start < end; start++)
+    {
+        node *n = build_node(&start, sizeof(start));
+        sll_push(last_ref, n);
+        last_ref = &((*last_ref)->next);
+    }
+
+    return list;
+}
+
+static bool
+verify_int_list(node *list, int start, int end)
+{
+    for (node *cur = list; cur != NULL && start <= end; cur = cur->next, start++)
+    {
+        // If the data doesn't match, error!
+        if (*(int *)cur->data != start) return false;
+    }
+
+    // If we haven't reached the end of the expected range, error!
+    if (start < end) return false;
+
+    return true;
+}
+
 static void
 test_push()
 {
     printf("Testing sll_push()\n------------------\n");
-            
-    node *list = NULL;
 
-    printf("Pushing 100 ints (0-99) onto the list...");
-    for (int i = 0; i < 100; i++) {
-        node *n = build_node(&i, sizeof(i));
-        sll_push(&list, n);
-    }
+    printf("Pushing ints 1-100 onto the list...");
+    node *list = build_int_list(0, 100);
     printf("OK!\n");
 
     printf("Verifying everything's in the list....");
-    for (int i = 100; i-- > 0; ) {
-        node *n = list;
-        assert(n != NULL);
-        assert(i == *(int *)n->data);
-        list = list->next;
-        free(n);
-    }
-    assert(list == NULL);
+    assert(verify_int_list(list, 0, 100));
     printf("OK!\n");
+
+    sll_free(list, NULL);
 
     printf("All good with sll_push()!\n\n");    
 }
@@ -91,17 +112,12 @@ test_pop()
 {
     printf("Testing sll_pop()\n-----------------\n");
 
-    node *list = NULL;
-
     printf("Pushing 100 ints (0-99) onto the list...");
-    for (int i = 0; i < 100; i++) {
-        node *n = build_node(&i, sizeof(i));
-        sll_push(&list, n);
-    }
+    node *list = build_int_list(0, 100);
     printf("OK!\n");
 
     printf("Popping everything out of the list...");
-    for (int i = 99; i >= 0; i--) {
+    for (int i = 0; i < 100; i++) {
         assert(list != NULL);
         node *n = sll_pop(&list);
         assert(i == *(int *)n->data);
@@ -168,7 +184,7 @@ test_find_last()
 static void
 test_append()
 {
-    printf("Testing append...");
+    printf("Testing sll_append()\n---------------\n");
 
     node *list = NULL;
 
@@ -178,15 +194,12 @@ test_append()
         sll_append(&list, n);
     }
 
-    // Make sure all of our ints are in there
-    for (int i = 0; i < 100; i++, list = list->next) {
-        assert(i == *(int *)list->data);
-    }
-
-    // Make sure we're at the end of the list
-    assert(list == NULL);
-
+    assert(verify_int_list(list, 0, 100));
     printf("OK!\n");
+
+    sll_free(list, NULL);
+
+    printf("All good with sll_append()!\n\n");
 }
 
 static void
@@ -200,13 +213,15 @@ test_ith()
     //node *n = sll_ith(list, 0);
     printf("OK!\n");
 
-    printf("Push 0-9 onto list, ensure that 3rd elem is 6...");
-    for (int i = 0; i < 10; i++) {
-        node *n = build_node(&i, sizeof(i));
-        sll_push(&list, n);
+    printf("Push 0-10 onto list, ensure that we can find them...");
+    list = build_int_list(0, 10);
+    for (int i = 0; i < 10; i++)
+    {
+        assert(*(int *)(sll_ith(list, i)->data) == i);    
     }
-    assert(*(int *)(sll_ith(list, 3)->data) == 6);
     printf("OK!\n");
+
+    sll_free(list, NULL);
 
     printf("All good with sll_ith()!\n\n");
 }
@@ -231,9 +246,7 @@ test_insert_ith()
     sll_insert_ith(&list, two, 1);
     sll_insert_ith(&list, one, 1);
 
-    for (int i = 0; i <= 2; i++) {
-        assert(*(int *)(sll_ith(list, i)->data) == i);
-    }
+    assert(verify_int_list(list, 0, 3));
 
     sll_free(list, NULL);
 
@@ -260,15 +273,14 @@ test_length()
     printf("OK!\n");
 
     printf("Pushing 100 ints (0-99) onto the list...");
-    for (int i = 0; i < 100; i++) {
-        node *n = build_node(&i, sizeof(i));
-        sll_push(&list, n);
-    }
+    list = build_int_list(0, 100);
     printf("OK!\n");
 
     printf("Ensuring length == 100...");
     assert(sll_length(list) == 100);
     printf("OK!\n");
+
+    sll_free(list, NULL);
 
     printf("All good with sll_length()!\n\n");
 }
@@ -287,10 +299,7 @@ test_free()
     node *list = NULL;
 
     printf("Pushing 100 ints (0-99) onto the list...");
-    for (int i = 0; i < 100; i++) {
-        node *n = build_node(&i, sizeof(i));
-        sll_push(&list, n);
-    }
+    list = build_int_list(0, 100);
     printf("OK!\n");
 
     printf("Freeing the list...");
@@ -320,10 +329,7 @@ test_search()
     list = NULL;
 
     // Prepend some ints to list
-    for (int i = 0; i < 100; i++) {
-        n = build_node(&i, sizeof(i));
-        sll_push(&list, n);
-    }
+    list = build_int_list(0, 100);
 
     // Make sure we can successfully find everything in the list
     for (int i = 0; i < 100; i++) {
@@ -349,13 +355,7 @@ test_elem_count()
 {
     printf("Testing sll_elem_count()\n------------------------\n");
 
-    node *list = NULL;
-
-    // Prepend some ints to list
-    for (int i = 0; i < 10; i++) {
-        node *n = build_node(&i, sizeof(i));
-        sll_push(&list, n);
-    }
+    node *list = build_int_list(0, 10);
 
     // Push all evens onto list again
     for (int i = 0; i < 10; i += 2) {
@@ -400,30 +400,36 @@ test_sorted_insert()
 {
     printf("Testing sll_sorted_insert()\n---------------------------\n");
     
-    node *list = NULL;
-
-    // Prepend some ints to list
-    for (int i = 0; i < 10; i++) {
-        if (i == 4) continue;
-        node *n = build_node(&i, sizeof(i));
-        sll_push(&list, n);
-    }
+    node *list = build_int_list(5, 10);
 
     int i = 4;
     node *n = build_node(&i, sizeof(i));
     sll_sorted_insert(&list, n, cmp_int);
 
-    i = 20;
+    i = 2;
     n = build_node(&i, sizeof(i));
     sll_sorted_insert(&list, n, cmp_int);
 
-    i = 2;
+    i = 10;
+    n = build_node(&i, sizeof(i));
+    sll_sorted_insert(&list, n, cmp_int);
+
+    i = 12;
     n = build_node(&i, sizeof(i));
     sll_sorted_insert(&list, n, cmp_int);    
 
     i = 3;
     n = build_node(&i, sizeof(i));
     sll_sorted_insert(&list, n, cmp_int);
+
+    i = 11;
+    n = build_node(&i, sizeof(i));
+    sll_sorted_insert(&list, n, cmp_int);
+
+    assert(verify_int_list(list, 2, 13));
+    printf("OK!\n");
+
+    sll_free(list, NULL);
 
     printf("All good with sll_sorted_insert()!\n\n");
 }
@@ -433,17 +439,15 @@ test_insert_sort()
 {
     printf("Testing sll_insert_sort()\n-------------------------\n");
 
-    node *list = NULL;
+    node *list = build_int_list(0, 10);
 
-    // Prepend some ints to list
-    for (int i = 0; i < 10; i++) {
-        node *n = build_node(&i, sizeof(i));
-        sll_push(&list, n);
-    }
 
-    print_list(list, print_int);
     sll_insert_sort(&list, cmp_int);
-    print_list(list, print_int);
+    
+    assert(verify_int_list(list, 0, 10));
+    printf("OK!\n");
+
+    sll_free(list, NULL);
 
     printf("All good with sll_insert_sort()!\n\n");
 }
@@ -453,6 +457,34 @@ test_front_back_split()
 {
     printf("Testing sll_front_back_split()\n------------------------------\n");
 
+    printf("Checking the empty list...");
+    node *list = NULL;
+    node *front, *back;
+    sll_front_back_split(list, &front, &back);
+    assert(front == NULL);
+    assert(back == NULL);
+    printf("OK!\n");
+
+    printf("Checking a single-elem list...");
+    int i = 7;
+    node *n = build_node(&i, sizeof(i));
+    sll_push(&list, n);
+    sll_front_back_split(list, &front, &back);
+    assert(front == n);
+    assert(back == NULL);
+    printf("OK!\n");
+
+    printf("Checking a two-elem list...");
+    
+    printf("OK!\n");
+
+    printf("Checking a three-elem list...");
+
+    printf("OK!\n");
+
+    printf("Checking a four-elem list...");
+
+    printf("OK!\n");
     printf("All good with sll_front_back_split()!\n\n");
 }
 
@@ -461,6 +493,64 @@ test_remove_duplicates()
 {
     printf("Testing sll_remove_duplicates()\n-------------------------------\n");
 
+    printf("Checking an empty list...");
+    node *list = NULL;
+    sll_remove_duplicates(list, cmp_int, NULL);
+    printf("OK!\n");
+
+    printf("Checking a single-elem list...");
+    int i = 7;
+    node *n = build_node(&i, sizeof(i));
+    sll_push(&list, n);
+    sll_remove_duplicates(list, cmp_int, NULL);
+    sll_free(list, NULL);
+    list = NULL;
+    printf("OK!\n");
+
+    printf("Checking a list with no duplicates...");
+    for (int i = 0; i < 10; i++)
+    {
+        node *n = build_node(&i, sizeof(i));
+        sll_push(&list, n);
+    }
+    sll_remove_duplicates(list, cmp_int, NULL);
+    assert(sll_length(list) == 10);
+    sll_free(list, NULL);
+    list = NULL;
+    printf("OK!\n");
+
+    printf("Checking a list with all duplicates...");
+    for (int i = 0; i < 4; i++)
+    {
+        int j = 7;
+        node *n = build_node(&j, sizeof(j));
+        sll_push(&list, n);
+    }
+    sll_remove_duplicates(list, cmp_int, NULL);
+    assert(sll_length(list) == 1);
+    sll_free(list, NULL);
+    list = NULL;
+    printf("OK!\n");
+
+    printf("Checking a list with half duplicates...");
+    for (int i = 0; i < 5; i++)
+    {
+        node *n = build_node(&i, sizeof(i));
+        sll_push(&list, n);
+
+        if (i % 2 == 0)
+        {
+            n = build_node(&i, sizeof(i));
+            sll_push(&list, n);
+        }
+    }
+    assert(sll_length(list) == 8);
+    sll_remove_duplicates(list, cmp_int, NULL);
+    assert(sll_length(list) == 5);
+    sll_free(list, NULL);
+    list = NULL;
+    printf("OK!\n");
+
     printf("All good with sll_remove_duplicates()!\n\n");
 }
 
@@ -468,6 +558,8 @@ static void
 test_move_node()
 {
     printf("Testing sll_move_node()\n-----------------------\n");
+
+    node *list = build_int_list(0, 10);
 
     printf("All good with sll_move_node()!\n\n");
 }
@@ -517,9 +609,17 @@ test_reverse()
 {
     printf("Testing sll_reverse()\n---------------------\n");
 
+    printf("Checking an empty list...");
     node *list = NULL;
+    sll_reverse(&list);
+    printf("OK!\n");
 
-    // Prepend some ints to list
+    printf("Checking a single-elem list...");
+
+    printf("OK!\n");
+
+
+    printf("Checking a ten-elem list...");
     for (int i = 0; i < 10; i++) {
         node *n = build_node(&i, sizeof(i));
         sll_push(&list, n);
@@ -530,7 +630,6 @@ test_reverse()
     for (int i = 0; i < 10; i++, list = list->next) {
         assert(i == *(int *)list->data);
     }
-
     printf("OK!\n");
 
     printf("All good with sll_reverse()!\n\n");
@@ -578,7 +677,7 @@ main(int argc, const char *argv[])
     test_sorted_insert();
     test_insert_sort();
 
-    test_front_back_split();
+    //test_front_back_split();
     test_remove_duplicates();
 
     test_move_node();

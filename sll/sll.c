@@ -15,6 +15,9 @@
 
 #include "sll.h"
 
+/**
+ * Pushes a node onto the front of a list.
+ */
 void
 sll_push(node **list, node *n)
 {
@@ -25,6 +28,9 @@ sll_push(node **list, node *n)
     *list = n;
 }
 
+/**
+ * Removes the first node of a list and returns it.
+ */
 node *
 sll_pop(node **list)
 {
@@ -37,6 +43,10 @@ sll_pop(node **list)
     return n;
 }
 
+/**
+ * Inserts a node into a list immediately after another.
+ * Does not work for empty lists.
+ */
 void
 sll_insert_after(node *n, node *to_insert)
 {
@@ -47,27 +57,43 @@ sll_insert_after(node *n, node *to_insert)
     n->next = to_insert;
 }
 
+/**
+ *
+ */
 void
-sll_remove_after(node *n)
+sll_remove_after(node *n, sll_free_fn free_fn)
 {
     assert(n != NULL);
 
-    // TODO: implement me!
+    node *to_remove = n->next;
+    if (to_remove != NULL)
+    {
+        node *next = to_remove->next;
+        if (free_fn != NULL) free_fn(to_remove->data);
+        free(to_remove);
+        n->next = next;
+    }
 }
 
-/* Find the last elem of a list */
+/**
+ * Finds the last element of a list.
+ */
 node *
 sll_find_last(node *list)
 {
     node *last;
 
-    for (last = list; list != NULL; list = list->next) {
+    for (last = list; list != NULL; list = list->next)
+    {
         last = list;
     }
 
     return last;
 }
 
+/**
+ * Appends a node/list to a list.
+ */
 void
 sll_append(node **list, node *n)
 {
@@ -78,12 +104,17 @@ sll_append(node **list, node *n)
     else sll_insert_after(sll_find_last(*list), n);
 }
 
+/**
+ * Returns a pointer to the ith node in a list. Errors
+ * if i is out of the range of the list (< 0 or > len - 1)
+ */
 node *
 sll_ith(node *list, int i)
 {
     assert(i >= 0);
 
-    for (; i > 0; i--) {
+    for (; i > 0; i--)
+    {
         assert(list != NULL);
         list = list->next;
     }
@@ -91,6 +122,9 @@ sll_ith(node *list, int i)
     return list;
 }
 
+/**
+ * 
+ */
 void
 sll_insert_ith(node **list, node *n, int i)
 {
@@ -98,9 +132,12 @@ sll_insert_ith(node **list, node *n, int i)
     assert(n != NULL);
     assert(i >= 0);
 
-    if (i == 0) {
+    if (i == 0)
+    {
         sll_push(list, n);
-    } else {
+    } 
+    else
+    {
         node *prev = sll_ith(*list, i - 1);
         sll_insert_after(prev, n);
     }
@@ -132,9 +169,11 @@ sll_length(node *list)
 void
 sll_free(node *list, sll_free_fn free_fn)
 {
-    while (list != NULL) {
+    while (list != NULL)
+    {
         node *next = list->next;
-        if (free_fn != NULL) {
+        if (free_fn != NULL)
+        {
             free_fn(list->data);
         }
         free(list);
@@ -148,19 +187,25 @@ sll_search(node *list, void *elem, sll_cmp_fn cmp_fn)
     assert(elem != NULL);
     assert(cmp_fn != NULL);
 
-    for (; list != NULL; list = list->next) {
+    for (; list != NULL; list = list->next)
+    {
         if (cmp_fn(list->data, elem) == 0) return list;
     }
 
     return NULL;
 }
 
+/**
+ * Counts the number of times that a particular elem
+ * occurs in a list
+ */
 size_t
 sll_elem_count(node *list, void *elem, sll_cmp_fn cmp_fn)
 {
     size_t elem_count = 0;
 
-    for (node *n = list; n != NULL; n = n->next) {
+    for (node *n = list; n != NULL; n = n->next)
+    {
         if (cmp_fn(n->data, elem) == 0) elem_count++;
     }
 
@@ -170,7 +215,8 @@ sll_elem_count(node *list, void *elem, sll_cmp_fn cmp_fn)
 void
 sll_map(node *list, sll_map_fn map_fn, void *aux_data)
 {
-    for (; list != NULL; list = list->next) {
+    for (; list != NULL; list = list->next)
+    {
         map_fn(list->data, aux_data);
     }
 }
@@ -183,6 +229,10 @@ sll_bubble_sort(node **list, sll_cmp_fn cmp_fn)
     // TODO: implement me!
 }
 
+/**
+ * Inserts a node into a list in sorted position according
+ * to the supplied comparison function.
+ */
 void
 sll_sorted_insert(node **list, node *n, sll_cmp_fn cmp_fn)
 {
@@ -191,7 +241,8 @@ sll_sorted_insert(node **list, node *n, sll_cmp_fn cmp_fn)
     assert(cmp_fn != NULL);
 
     node *prev = NULL;
-    for (node *cur = *list; cur != NULL; prev = cur, cur = cur->next) {
+    for (node *cur = *list; cur != NULL; prev = cur, cur = cur->next)
+    {
         if (cmp_fn(cur->data, n->data) > 0) break;
     }
 
@@ -200,6 +251,10 @@ sll_sorted_insert(node **list, node *n, sll_cmp_fn cmp_fn)
 
 }
 
+/**
+ * Sorts a list using the insert sort algorithm according
+ * to the supplied comparison function.
+ */
 void
 sll_insert_sort(node **list, sll_cmp_fn cmp_fn)
 {
@@ -208,7 +263,8 @@ sll_insert_sort(node **list, sll_cmp_fn cmp_fn)
 
     node *sorted_list = NULL;
     
-    while (*list != NULL) {
+    while (*list != NULL)
+    {
         node *n = sll_pop(list);
         sll_sorted_insert(&sorted_list, n, cmp_fn);
     }
@@ -216,6 +272,11 @@ sll_insert_sort(node **list, sll_cmp_fn cmp_fn)
     *list = sorted_list;
 }
 
+/**
+ * Splits a list into two sublists, one for the front half
+ * and one for the back half. If the number of elements is
+ * odd, then the extra element goes in the front list.
+ */
 void
 sll_front_back_split(node *list, node **front, node **back)
 {
@@ -232,12 +293,32 @@ sll_front_back_split(node *list, node **front, node **back)
     front_end->next = NULL;
 }
 
+/**
+ * Removes duplicates from a list sorted in increasing
+ * order. Traverses the list only once.
+ */
 void
-sll_remove_duplicates(node *list, sll_cmp_fn cmp_fn)
+sll_remove_duplicates(node *list, sll_cmp_fn cmp_fn, sll_free_fn free_fn)
 {
+    if (list == NULL) return;
 
+    for (node *prev = list, *cur = prev->next; cur != NULL; cur = prev->next)
+    {
+        if (cmp_fn(prev->data, cur->data) == 0) 
+        {
+            sll_remove_after(prev, free_fn);
+        }
+        else
+        {
+            prev = cur;
+        }
+    }
 }
 
+/**
+ * Moves the first node of the source list to the front
+ * of the destination list.
+ */
 void
 sll_move_node(node **dst, node **src)
 {
@@ -250,13 +331,11 @@ sll_move_node(node **dst, node **src)
 void
 sll_alternating_split(node *list, node **a, node **b)
 {
-    node **to_push = a;
-
-    while (list != NULL) {
-        sll_push(a, sll_pop(&list));
-        if (list != NULL) {
-            sll_push(b, sll_pop(&list));
-        }
+    while (list != NULL)
+    {
+        sll_move_node(a, &list);
+        if (list == NULL) break;
+        sll_move_node(b, &list);
     }
 }
 
@@ -291,7 +370,8 @@ sll_reverse(node **list)
 
     node *reversed_list = NULL;
 
-    while (*list != NULL) {
+    while (*list != NULL)
+    {
         sll_push(&reversed_list, sll_pop(list));
     }
 
@@ -310,8 +390,8 @@ sll_detect_cycle(node *list)
     if (list == NULL) return false;
 
     for (node *tortoise = list, *hare = list->next; hare != NULL; 
-         tortoise = tortoise->next, hare = hare->next) {
-
+         tortoise = tortoise->next, hare = hare->next) 
+    {
         if (tortoise == hare) return true;
 
         hare = hare->next;

@@ -15,7 +15,6 @@ CC = gcc
 #  -pedantic   require compliance with ANSI standard
 #  -O0         do not optimize generated code
 #  -std=gnu99  use the Gnu C99 standard language definition
-#  -m32        emit code for IA32 architecture
 CFLAGS = -g -Wall -pedantic -O0 -std=gnu99
 
 # The LDFLAGS variable sets flags for linker
@@ -35,9 +34,10 @@ LIB_TARGETS =
 # target makes all test programs
 default: $(TARGETS)
 
+# $@ is a substitution for the name of the target (sll-test)
+# $^ is a substitution for all of the dependencies (sll.o and sll-test.o)
 sll-test : sll.o sll-test.o
 	$(CC) $(CFLAGS) -o $@  $^ $(LDFLAGS)
-
 
 # In make's default rules, a .o automatically depends on its .c file
 # (so editing the .c will cause recompilation into its .o file).
