@@ -1,10 +1,9 @@
-/*
+/**
  * sll.c
  * -----
  * Author: Nate Hardison
  *
- * Implementation of some helper functions for a generic, singly-linked
- * list. Includes some interesting algorithms (reversal, cycle detection).
+ * Implementation of a generic, singly-linked list.
  */
 
 #include <stdlib.h>
