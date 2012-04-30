@@ -47,17 +47,6 @@ print_list(node *list, sll_map_fn print_fn)
     printf("NULL\n");
 }
 
-static node *
-build_node(void *elem, size_t elem_size)
-{
-    node *n = calloc(1, sizeof(node) + elem_size);
-    if (n == NULL) {
-        // handle out-of-memory error
-    }
-    memcpy(n->data, elem, elem_size);
-    return n;
-}
-
 static void
 test_push()
 {

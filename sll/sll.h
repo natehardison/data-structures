@@ -10,18 +10,21 @@
 #ifndef _SLL_H
 #define _SLL_H
 
+typedef struct node node_t;
+
 typedef struct
 {
-    void *next;
-    char data[];
-} node;
+	node_t *head;
+	size_t elem_size;
+	sll_free_fn free_fn;
+} sll;
 
 typedef void (*sll_map_fn)(void *elem, void *aux_data);
 typedef int (*sll_cmp_fn)(const void *a, const void *b);
 typedef void (*sll_free_fn)(void *elem);
 
-void sll_push(node **list, node *n);
-node *sll_pop(node **list);
+void sll_push(sll **list, void *elem);
+void *sll_pop(sll **list);
 
 void sll_insert_after(node *n, node *to_insert);
 void sll_remove_after(node *n);

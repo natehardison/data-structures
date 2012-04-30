@@ -15,18 +15,29 @@
 
 #include "sll.h"
 
-void
-sll_push(node **list, node *n)
+static node *
+build_node(void *elem, size_t elem_size)
 {
-    assert(list != NULL);
-    assert(n != NULL);
-
-    n->next = *list;
-    *list = n;
+    node *n = calloc(1, sizeof(node) + elem_size);
+    if (n == NULL) {
+        // handle out-of-memory error
+    }
+    memcpy(n->data, elem, elem_size);
+    return n;
 }
 
-node *
-sll_pop(node **list)
+static void
+push(node **head, node *n)
+{
+    assert(head != NULL);
+    assert(n != NULL);
+
+    n->next = *head;
+    *head = n;
+}
+
+static void
+pop(node **head)
 {
     assert(list != NULL);
     assert(*list != NULL);
@@ -37,8 +48,8 @@ sll_pop(node **list)
     return n;
 }
 
-void
-sll_insert_after(node *n, node *to_insert)
+static void
+insert_after(node *n, node *to_insert)
 {
     assert(n != NULL);
     assert(to_insert != NULL);
@@ -47,8 +58,8 @@ sll_insert_after(node *n, node *to_insert)
     n->next = to_insert;
 }
 
-void
-sll_remove_after(node *n)
+static void
+remove_after(node *n, sll_free_fn free_fn)
 {
     assert(n != NULL);
 
@@ -56,58 +67,157 @@ sll_remove_after(node *n)
 }
 
 /* Find the last elem of a list */
-node *
-sll_find_last(node *list)
+static node *
+last(node *head)
 {
     node *last;
 
-    for (last = list; list != NULL; list = list->next) {
-        last = list;
+    for (last = head; head != NULL; head = head->next) {
+        last = head;
     }
 
     return last;
 }
 
-void
-sll_append(node **list, node *n)
+static void
+append(node **head, node *n)
 {
-    assert(list != NULL);
-    assert(n != NULL);
-
-    if (*list == NULL) sll_push(list, n);
-    else sll_insert_after(sll_find_last(*list), n);
+    if (*head == NULL) push(head, n);
+    else insert_after(last(*head), n);
 }
 
-node *
-sll_ith(node *list, int i)
+static node *
+ith(node *head, int i)
 {
-    assert(i >= 0);
-
     for (; i > 0; i--) {
-        assert(list != NULL);
-        list = list->next;
+        assert(head != NULL);
+        head = head->next;
+    }   
+}
+
+static void
+insert_ith(node **head, int i, node *n)
+{
+    if (i == 0) {
+        push(head, n);
+    } else {
+        node *prev = ith(head, i - 1);
+        insert_after(prev, n);
     }
+}
+
+static size_t
+length(node *head)
+{
+    size_t len = 0;
+    while (head != NULL)
+    {
+        head = head->next;
+        len++;
+    }
+    return len;
+}
+
+static void
+sorted_insert(node **head, node *n, sll_cmp_fn cmp_fn)
+{
+    node *prev = NULL;
+    for (node *cur = *head; cur != NULL; prev = cur, cur = cur->next) {
+        if (cmp_fn(cur->data, n->data) > 0) break;
+    }
+
+    if (prev == NULL) push(head, n);
+    else insert_after(prev, n);
+}
+
+static void
+reverse(node **head)
+{
+    node *reversed_list = NULL;
+
+    while (*head != NULL)
+    {
+        sll_push(&reversed_list, pop(head));
+    }
+
+    *head = reversed_list;   
+}
+
+/**** SLL API IMPLEMENTATION ****/
+sll *
+sll_init(size_t elem_size, sll_free_fn free_fn)
+{
+    assert(elem_size > 0);
+
+    sll *list = malloc(sizeof(sll));
+    list->head = NULL;
+    list->elem_size = elem_size;
+    list->free_fn = free_fn;
 
     return list;
 }
 
 void
-sll_insert_ith(node **list, node *n, int i)
+sll_push(sll *list, void *elem)
+{
+    assert(list != NULL);
+    assert(elem != NULL);
+
+    node *n = build_node(elem, list->elem_size);
+    push(&list->head, n);
+}
+
+void *
+sll_pop(sll *list)
+{
+    assert(list != NULL);
+
+    node *n = pop(&list->head);
+
+    // Need to copy the elem to safe space so that we can
+    // dispose of the node
+    void *elem = malloc(list->elem_size);
+    memcpy(elem, n->data, elem_size);
+
+    free(n);
+
+    return elem;
+}
+
+void
+sll_append(sll *list, void *elem)
+{
+    assert(list != NULL);
+    assert(elem != NULL);
+
+    node *n = build_node(elem, list->elem_size);
+    append(&list->head, n);
+}
+
+void *
+sll_ith(sll *list, int i)
+{
+    assert(list != NULL);
+    assert(i >= 0);
+
+    node *ith = ith(list->head, i);
+
+    return ith->data;
+}
+
+void
+sll_insert_ith(sll *list, int i, void *elem)
 {
     assert(list != NULL);
     assert(n != NULL);
     assert(i >= 0);
 
-    if (i == 0) {
-        sll_push(list, n);
-    } else {
-        node *prev = sll_ith(*list, i - 1);
-        sll_insert_after(prev, n);
-    }
+    node *n = build_node(elem, list->elem_size);
+    insert_ith(&list->head, i, n);
 }
 
 void
-sll_remove_ith(node **list, int i)
+sll_remove_ith(sll *list, int i)
 {
     assert(list != NULL);
     assert(i >= 0);
@@ -115,52 +225,57 @@ sll_remove_ith(node **list, int i)
     // TODO: implement me!
 }
 
-static void
-count_length(void *elem, void *aux_data)
-{
-    (*(size_t *)aux_data)++;
-}
-
 size_t
-sll_length(node *list)
+sll_length(sll *list)
 {
-    size_t length = 0;
-    sll_map(list, count_length, &length);
-    return length;
+    assert(list != NULL);
+
+    return length(list->head);
 }
 
 void
-sll_free(node *list, sll_free_fn free_fn)
+sll_free(sll *list)
 {
-    while (list != NULL) {
-        node *next = list->next;
-        if (free_fn != NULL) {
-            free_fn(list->data);
+    assert(list != NULL);
+
+    while (list->head != NULL)
+    {
+        node *n = pop(&list->head);
+        if (list->free_fn != NULL)
+        {
+            list->free_fn(n->data);
         }
-        free(list);
-        list = next;
+        free(n);
     }
+    free(list);
 }
 
-node *
-sll_search(node *list, void *elem, sll_cmp_fn cmp_fn)
+void *
+sll_search(sll *list, void *elem, sll_cmp_fn cmp_fn)
 {
+    assert(list != NULL);
     assert(elem != NULL);
     assert(cmp_fn != NULL);
 
-    for (; list != NULL; list = list->next) {
-        if (cmp_fn(list->data, elem) == 0) return list;
+    for (node *n = list->head; n != NULL; n = n->next)
+    {
+        if (cmp_fn(n->data, elem) == 0) return n->data;
     }
 
     return NULL;
 }
 
 size_t
-sll_elem_count(node *list, void *elem, sll_cmp_fn cmp_fn)
+sll_elem_count(sll *list, void *elem, sll_cmp_fn cmp_fn)
 {
+    assert(list != NULL);
+    assert(elem != NULL);
+    assert(cmp_fn != NULL);
+
     size_t elem_count = 0;
 
-    for (node *n = list; n != NULL; n = n->next) {
+    for (node *n = list->head; n != NULL; n = n->next)
+    {
         if (cmp_fn(n->data, elem) == 0) elem_count++;
     }
 
@@ -168,56 +283,55 @@ sll_elem_count(node *list, void *elem, sll_cmp_fn cmp_fn)
 }
 
 void
-sll_map(node *list, sll_map_fn map_fn, void *aux_data)
+sll_map(sll *list, sll_map_fn map_fn, void *aux_data)
 {
-    for (; list != NULL; list = list->next) {
-        map_fn(list->data, aux_data);
+    assert(list != NULL);
+    assert(map_fn != NULL);
+
+    for (node *n = list->head; n != NULL; n = n->next)
+    {
+        map_fn(n->data, aux_data);
     }
 }
 
 void
-sll_bubble_sort(node **list, sll_cmp_fn cmp_fn)
+sll_bubble_sort(sll *list, sll_cmp_fn cmp_fn)
 {
     assert(list != NULL);
+    assert(cmp_fn != NULL);
 
     // TODO: implement me!
 }
 
 void
-sll_sorted_insert(node **list, node *n, sll_cmp_fn cmp_fn)
+sll_sorted_insert(sll *list, void *elem, sll_cmp_fn cmp_fn)
 {
     assert(list != NULL);
-    assert(n != NULL);
+    assert(elem != NULL);
     assert(cmp_fn != NULL);
 
-    node *prev = NULL;
-    for (node *cur = *list; cur != NULL; prev = cur, cur = cur->next) {
-        if (cmp_fn(cur->data, n->data) > 0) break;
-    }
-
-    if (prev == NULL) sll_push(list, n);
-    else sll_insert_after(prev, n);
-
+    node *n = build_node(elem, list->elem_size);
+    sorted_insert(&list->head, n, cmp_fn);
 }
 
 void
-sll_insert_sort(node **list, sll_cmp_fn cmp_fn)
+sll_insert_sort(sll *list, sll_cmp_fn cmp_fn)
 {
     assert(list != NULL);
     assert(cmp_fn != NULL);
 
     node *sorted_list = NULL;
     
-    while (*list != NULL) {
-        node *n = sll_pop(list);
-        sll_sorted_insert(&sorted_list, n, cmp_fn);
+    while (list->head != NULL) {
+        node *n = pop(&list->head);
+        sorted_insert(&sorted_list, n, cmp_fn);
     }
 
-    *list = sorted_list;
+    list->head = sorted_list;
 }
 
 void
-sll_front_back_split(node *list, node **front, node **back)
+sll_front_back_split(sll *list, sll *front, sll *back)
 {
     assert(front != NULL);
     assert(back != NULL);
@@ -233,79 +347,71 @@ sll_front_back_split(node *list, node **front, node **back)
 }
 
 void
-sll_remove_duplicates(node *list, sll_cmp_fn cmp_fn)
+sll_remove_duplicates(sll *list, sll_cmp_fn cmp_fn)
 {
 
 }
 
 void
-sll_move_node(node **dst, node **src)
+sll_move_node(sll *dst, sll *src)
 {
     assert(dst != NULL);
     assert(src != NULL);
 
-    sll_push(dst, sll_pop(src));
+    push(&dst->head, pop(&src->head));
 }
 
 void
-sll_alternating_split(node *list, node **a, node **b)
+sll_alternating_split(sll *list, sll **a, sll **b)
 {
     node **to_push = a;
 
     while (list != NULL) {
         sll_push(a, sll_pop(&list));
-        if (list != NULL) {
-            sll_push(b, sll_pop(&list));
-        }
+        if (list == NULL) break;
+        sll_push(b, sll_pop(&list));
     }
 }
 
-node *
-sll_shuffle_merge(node *a, node *b)
+sll *
+sll_shuffle_merge(sll *a, sll *b)
 {
     return NULL;
 }
 
-node *
-sll_sorted_merge(node *a, node *b, sll_cmp_fn cmp_fn)
-{
-    return NULL;
-}
-
-void
-sll_merge_sort(node **list, sll_cmp_fn cmp_fn)
-{
-
-}
-
-node *
-sll_sorted_intersect(node *a, node *b, sll_cmp_fn cmp_fn)
+sll *
+sll_sorted_merge(sll *a, sll *b, sll_cmp_fn cmp_fn)
 {
     return NULL;
 }
 
 void
-sll_reverse(node **list)
+sll_merge_sort(sll *list, sll_cmp_fn cmp_fn)
+{
+
+}
+
+sll *
+sll_sorted_intersect(sll *a, sll *b, sll_cmp_fn cmp_fn)
+{
+    return NULL;
+}
+
+void
+sll_reverse(sll *list)
 {
     assert(list != NULL);
-
-    node *reversed_list = NULL;
-
-    while (*list != NULL) {
-        sll_push(&reversed_list, sll_pop(list));
-    }
-
-    *list = reversed_list;
+    reverse(&list->head);
 }
 
 void
-sll_reverse_recursive(node **list)
+sll_reverse_recursive(sll *list)
 {
 
 }
 
 bool
-sll_detect_cycle(node *list)
+sll_detect_cycle(sll *list)
 {
     if (list == NULL) return false;
 
