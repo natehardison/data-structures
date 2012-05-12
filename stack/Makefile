@@ -5,8 +5,9 @@
 # Julie Zelenski, for CS107, Sept 2009
 #
 
-# Use clang instead of gcc
-CC = clang
+# It is likely that default C compiler is already gcc, but explicitly
+# set, just to be sure
+CC = gcc
 
 # The CFLAGS variable sets compile flags for gcc:
 #  -g          compile with debug information
@@ -14,19 +15,19 @@ CC = clang
 #  -pedantic   require compliance with ANSI standard
 #  -O0         do not optimize generated code
 #  -std=gnu99  use the Gnu C99 standard language definition
+#  -m32        emit code for IA32 architecture
 CFLAGS = -g -Wall -pedantic -O0 -std=gnu99
 
 # The LDFLAGS variable sets flags for linker
-# Currently we don't need to link with anything
 LDFLAGS = 
 
 # In this section, you list the files that are part of the project.
 # If you add/change names of header/source files, here is where you
 # edit the Makefile.
-HEADERS = node.h sll.h
-SOURCES = node.c sll.c sll-test.c
-LIBRARIES = -L. -lsll -lnode
-TARGETS =  sll-test
+HEADERS = stack.h
+SOURCES = stack-array.c stack-list.c stack-test.c
+LIBRARIES = -L. -lstack
+TARGETS =  stack-array-test stack-list-test
 LIB_TARGETS = 
 
 # The first target defined in the makefile is the one
@@ -34,9 +35,10 @@ LIB_TARGETS =
 # target makes all test programs
 default: $(TARGETS)
 
-# $@ is a substitution for the name of the target (sll-test)
-# $^ is a substitution for all of the dependencies (sll.o and sll-test.o)
-sll-test : node.o sll.o sll-test.o
+stack-array-test : stack-array.o stack-test.o
+	$(CC) $(CFLAGS) -o $@  $^ $(LDFLAGS)
+
+stack-list-test : stack-list.o stack-test.o
 	$(CC) $(CFLAGS) -o $@  $^ $(LDFLAGS)
 
 # In make's default rules, a .o automatically depends on its .c file
@@ -47,6 +49,7 @@ Makefile.dependencies:: $(SOURCES) $(HEADERS)
 	$(CC) $(CFLAGS) -MM $(SOURCES) > Makefile.dependencies
 
 -include Makefile.dependencies
+
 
 # Phony means not a "real" target, it doesn't build anything
 # The phony target "clean" that is used to remove all compiled object files.

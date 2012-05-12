@@ -1,5 +1,5 @@
-cvector
-cmap
+vector
+map
 */Makefile.dependencies
 */*-test
 */*.pdf
