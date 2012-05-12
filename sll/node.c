@@ -1,9 +1,10 @@
-#include <stdlib.h>
-#include <assert.h>
 #include "node.h"
 
+#include <stdlib.h>
+#include <assert.h>
+
 void
-push(node **head, node *n)
+push(node_t **head, node_t *n)
 {
   assert(head != NULL);
   assert(n != NULL);
@@ -11,18 +12,18 @@ push(node **head, node *n)
   *head = n;
 }
 
-node *
-pop(node **head)
+node_t *
+pop(node_t **head)
 {
   assert(head != NULL);
   assert(*head != NULL);
-  node *n = *head;
+  node_t *n = *head;
   *head = n->next;
   return n;
 }
 
 void
-insert_after(node *n, node *to_insert)
+insert_after(node_t *n, node_t *to_insert)
 {
   assert(n != NULL);
   assert(to_insert != NULL);
@@ -30,19 +31,19 @@ insert_after(node *n, node *to_insert)
   n->next = to_insert;
 }
 
-node *
-remove_after(node *n)
+node_t *
+remove_after(node_t *n)
 {
   assert(n != NULL);
-  node *to_remove = n->next;
+  node_t *to_remove = n->next;
   if (to_remove != NULL) {
     n->next = to_remove->next;
   }
   return to_remove;
 }
 
-node *
-ith(node *head, int i)
+node_t *
+ith(node_t *head, int i)
 {
   for (; i > 0; i--) {
     assert(head != NULL);
@@ -52,7 +53,7 @@ ith(node *head, int i)
 }
 
 size_t
-length(node *head)
+length(node_t *head)
 {
   size_t len = 0;
   while (head != NULL) {
@@ -60,20 +61,4 @@ length(node *head)
     len++;
   }
   return len;
-}
-
-void
-reverse(node **head)
-{
-  node *reversed_list = NULL;
-  while (*head != NULL) {
-    push(&reversed_list, pop(head));
-  }
-  *head = reversed_list;   
-}
-
-void
-reverse_recursive(node **head)
-{
-  // TODO!
 }

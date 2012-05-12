@@ -1,14 +1,17 @@
-/*
+/**
  * sll.h
  * -----
  * Author: Nate Hardison
  *
- * Implementation of a generic singly linked list.
+ * Implementation of a generic, singly-linked list. This serves as a wrapper
+ * around the node_t module, which is where most of the primary linked list
+ * operations are implemented. The idea is that clients of the sll module
+ * are interested in manipulating values instead of node_ts, so we hide those
+ * details from them.
  */
 #include <stdbool.h>
 
-/* Figure out a good way to forward-declare node */
-#include "node.h"
+#include "node.h" /* Figure out a good way to forward-declare node_t */
 
 #ifndef SLL_H_
 #define SLL_H_
@@ -19,7 +22,7 @@ typedef void (*sll_free_fn)(void *elem);
 
 typedef struct
 {
-  node *head;
+  node_t *head;
   size_t elem_size;
   sll_free_fn free_fn;
 } sll;
@@ -37,8 +40,18 @@ void sll_map(sll *list, sll_map_fn map_fn, void *aux_data);
 void sll_bubble_sort(sll *list, sll_cmp_fn cmp_fn);
 void sll_sorted_insert(sll *list, void *elem, sll_cmp_fn cmp_fn);
 void sll_insert_sort(sll *list, sll_cmp_fn cmp_fn);
+
+/* Splits a list into two sublists, one for the front half
+ * and one for the back half. If the number of elements is
+ * odd, then the extra element goes in the front list. */
 void sll_front_back_split(sll *list, sll *front, sll *back);
+
+/* Removes duplicates from a list sorted in increasing
+ * order. Traverses the list only once. */
 void sll_remove_duplicates(sll *list, sll_cmp_fn cmp_fn);
+
+/* Moves the first node_t of the source list to the front
+ * of the destination list. */
 void sll_move_node(sll *dst, sll *src);
 void sll_alternating_split(sll *list, sll *a, sll *b);
 sll *sll_shuffle_merge(sll *a, sll *b);
