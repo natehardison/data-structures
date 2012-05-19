@@ -10,7 +10,7 @@
 static node_t *
 build_node(void *elem, size_t elem_size)
 {
-  node_t *n = calloc(1, sizeof(node_t));
+  node_t *n = calloc(1, sizeof(node_t) + elem_size);
   if (n == NULL) {
     printf("malloc() failed! Exiting...\n");
     exit(1);
@@ -76,6 +76,12 @@ bst_insert(bst_t *tree, void *elem)
   } 
 }
 
+void
+bst_remove(bst_t *tree)
+{
+  NOT_YET_IMPLEMENTED
+}
+
 static void *
 search(node_t *n, void *elem, bst_cmp_fn cmp_fn)
 {
@@ -96,8 +102,49 @@ bst_search(bst_t *tree, void *elem)
   return search(tree->root, elem, tree->cmp_fn);
 }
 
-void
-bst_remove(bst_t *tree)
+static void
+map_pre_order(node_t *n, bst_map_fn map_fn, void *aux_data)
 {
-  NOT_YET_IMPLEMENTED
+  if (n != NULL) {
+    map_fn(n->data, aux_data);
+    map_pre_order(n->left_child, map_fn, aux_data);
+    map_pre_order(n->right_child, map_fn, aux_data);
+  } 
+}
+
+static void
+map_in_order(node_t *n, bst_map_fn map_fn, void *aux_data)
+{
+  if (n != NULL) {
+    map_in_order(n->left_child, map_fn, aux_data);
+    map_fn(n->data, aux_data);
+    map_in_order(n->right_child, map_fn, aux_data);
+  }
+}
+
+static void
+map_post_order(node_t *n, bst_map_fn map_fn, void *aux_data)
+{
+  if (n != NULL) {
+    map_post_order(n->left_child, map_fn, aux_data);
+    map_post_order(n->right_child, map_fn, aux_data);
+    map_fn(n->data, aux_data);
+  }
+}
+
+void
+bst_map(bst_t *tree, enum ORDER traversal_order, bst_map_fn map_fn, void *aux_data)
+{
+  switch (traversal_order) {
+  case PRE_ORDER:
+    map_pre_order(tree->root, map_fn, aux_data);
+    break;
+  case POST_ORDER:
+    map_post_order(tree->root, map_fn, aux_data);
+    break;
+  case IN_ORDER:
+  default:
+    map_in_order(tree->root, map_fn, aux_data);
+    break;
+  }
 }
