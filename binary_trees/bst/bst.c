@@ -34,10 +34,24 @@ bst_init(size_t elem_size, bst_cmp_fn cmp_fn, bst_free_fn free_fn)
   return tree;
 }
 
+static void
+free_node(node *n, bst_free_fn free_fn)
+{
+  if (n == NULL) {
+    return;
+  }
+  free_node(n->left_child, free_fn);
+  free_node(n->right_child, free_fn);
+  if (free_fn != NULL) {
+    free_fn(n->data);
+  }
+  free(n);
+}
+
 void
 bst_free(bst_t *tree)
 {
-  NOT_YET_IMPLEMENTED
+  free_node(tree->root);
 }
 
 size_t
