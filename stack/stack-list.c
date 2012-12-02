@@ -1,42 +1,50 @@
-/**
+/*************************************************************************
  * stack-list.c
  * ------------
- * Author: Nate Hardison
+ * Nate Hardison <natehardison@gmail.com>
  *
- * Implementation of a list-based stack.
- */
-#include <stdlib.h>
-#include <string.h>
+ * Implementation of a singly-linked list-based generic stack container.
+ ************************************************************************/
 
 #include "stack.h"
 
-stack *
-stack_init(size_t elem_size, size_t init_alloc, stack_free_fn free_fn)
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+stack *stack_init(size_t elem_size, size_t init_alloc,
+                  stack_free_fn free_fn)
 {
     stack *s = calloc(1, sizeof(stack));
+    if (s == NULL)
+    {
+        fprintf(stderr, "error: stack_init(): Out of heap memory\n");
+        exit(1);
+    }
     s->elem_size = elem_size;
     s->num_elems = 0;
     s->alloc_size = (init_alloc == 0)? DEFAULT_ALLOCATION : init_alloc;
     s->free_fn = free_fn;
     s->elems = NULL;
-
     return s;
 }
 
-void
-stack_push(stack *s, void *elem)
+void stack_push(stack *s, const void *elem)
 {
-	
+	// TODO: use sll library!
 }
 
-void *
-stack_pop(stack *s)
+void *stack_pop(stack *s)
 {
 	return NULL;
 }
 
-size_t
-stack_size(stack *s)
+size_t stack_size(const stack *s)
 {
 	return s->num_elems;
+}
+
+void stack_free(stack *s)
+{
+    // TODO
 }

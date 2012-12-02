@@ -12,11 +12,12 @@ CC = gcc
 # The CFLAGS variable sets compile flags for gcc:
 #  -g          compile with debug information
 #  -Wall       give all diagnostic warnings
+#  -Werror     turn warnings into build errors
 #  -pedantic   require compliance with ANSI standard
 #  -O0         do not optimize generated code
 #  -std=gnu99  use the Gnu C99 standard language definition
 #  -m32        emit code for IA32 architecture
-CFLAGS = -g -Wall -pedantic -O0 -std=gnu99
+CFLAGS = -g -Wall -Werror -pedantic -O0 -std=gnu99
 
 # The LDFLAGS variable sets flags for linker
 LDFLAGS = 
@@ -55,6 +56,7 @@ Makefile.dependencies:: $(SOURCES) $(HEADERS)
 # The phony target "clean" that is used to remove all compiled object files.
 .PHONY: clean
 
+# Include *.dSYM for Mac OSX
 clean:
-	@rm -f $(TARGETS) $(LIB_TARGETS) *.o core Makefile.dependencies
+	@rm -rf $(TARGETS) $(LIB_TARGETS) *.o core Makefile.dependencies *.vgcore *.dSYM
 
