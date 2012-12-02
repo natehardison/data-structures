@@ -9,21 +9,22 @@ typedef void (*bst_map_fn)(void *elem, void *aux_data);
 
 enum ORDER { PRE_ORDER, IN_ORDER, POST_ORDER };
 
-struct node {
-  struct node *left_child;
-  struct node *right_child;
-  char data[];
-};
+typedef struct node
+{
+    struct node *left_child;
+    struct node *right_child;
+    char data[];
+}
+node_t;
 
-struct bst {
-  struct node *root;
-  size_t elem_size;
-  bst_cmp_fn cmp_fn;
-  bst_free_fn free_fn;
-};
-
-typedef struct bst bst_t;
-typedef struct node node_t;
+typedef struct bst
+{
+    struct node *root;
+    size_t elem_size;
+    bst_cmp_fn cmp_fn;
+    bst_free_fn free_fn;
+}
+bst_t;
 
 bst_t *bst_init(size_t elem_size, bst_cmp_fn cmp_fn, bst_free_fn free_fn);
 void bst_free(bst_t *tree);

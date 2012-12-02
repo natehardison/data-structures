@@ -5,32 +5,64 @@
 
 #include "bst.h"
 
-static int
-cmp_int(const void *a, const void *b)
+static int cmp_int(const void *a, const void *b)
 {
-  return *(const int *)a - *(const int *)b;
+    return *(const int *)a - *(const int *)b;
 }
 
-static void
-print_int(void *elem, void *unused)
+static void print_int(void *elem, void *unused)
 {
-  printf("%d->", *(int *)elem);
+    printf("%d->", *(int *)elem);
 }
 
-int
-main(int argc, const char *argv[])
+static node_t *build_node(int val)
 {
-  bst_t *tree = bst_init(sizeof(int), cmp_int, NULL);
-  assert(tree != NULL);
-  assert(tree->root == NULL);
+    node_t *n = calloc(1, sizeof(node_t));
+    if (n == NULL)
+    {
+        printf("Out of memory...\n");
+        exit(1);
+    }
+    memcpy(n->data, &val, sizeof(int));
+    return n;
+}
 
-  for (int i = 0; i < 10; i++) {
-    int rand = (int)(random() % 100);
-    bst_insert(tree, &rand);
-  }
+int main(int argc, const char *argv[])
+{
+    bst_t *tree = bst_init(sizeof(int), cmp_int, NULL);
+    assert(tree != NULL);
+    assert(tree->root == NULL);
 
-  bst_map(tree, IN_ORDER, print_int, NULL);
-  printf("\n");
+    tree->root = build_node(3);
+    printf("Height: %lu\n", bst_height(tree));
 
-  return 0;
+    tree->root->left_child = build_node(5);
+    printf("Height: %lu\n", bst_height(tree));
+
+    tree->root->right_child = build_node(5);
+    printf("Height: %lu\n", bst_height(tree));
+
+    tree->root->right_child->right_child = build_node(5);
+    printf("Height: %lu\n", bst_height(tree));
+
+    tree->root->right_child->right_child->right_child = build_node(5);
+    printf("Height: %lu\n", bst_height(tree));
+  
+/*    for (int i = 0; i < 10000; i++)
+    {
+        int rand = (int)(random() % 100000);
+        bst_insert(tree, &rand);
+    }
+
+    for (int i = 0; i < 10000; i++)
+    {
+        int rand = (int)(random() % 100000);
+        printf("bst_search(%d) = %s\n", rand, bst_search(tree, &rand)? "YES" : "NO");
+    }
+*/
+  
+    //bst_map(tree, IN_ORDER, print_int, NULL);
+    //printf("\n");
+  
+    return 0;
 }
