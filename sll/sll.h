@@ -25,7 +25,8 @@ typedef struct
   node_t *head;
   size_t elem_size;
   sll_free_fn free_fn;
-} sll;
+}
+sll;
 
 void sll_push(sll *list, void *elem);
 void *sll_pop(sll *list);
