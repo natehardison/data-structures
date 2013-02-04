@@ -15,15 +15,12 @@
 
 typedef void (*stack_free_fn)(void *elem);
 
-typedef struct
-{
-    size_t elem_size;
-    size_t num_elems;
-    size_t alloc_size;
-    stack_free_fn free_fn;
-    void *elems;
-}
-stack;
+/**
+ * We avoid defining the struct stack here so that we can change the
+ * underlying implementation of the stack, depending on whether we want an
+ * array-based or a list-based stack.
+ */
+typedef struct stack stack;
 
 /**
  * Initializes a new stack for elements of size elem_size. The stack will

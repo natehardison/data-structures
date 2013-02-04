@@ -12,6 +12,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+struct stack
+{
+    size_t elem_size;
+    size_t num_elems;
+    size_t alloc_size;
+    stack_free_fn free_fn;
+    void *elems;
+};
+
 /**
  * "Grows" the stack by doubling its size.
  */
