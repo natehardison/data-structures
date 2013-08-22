@@ -3,3 +3,4 @@ map
 */Makefile.dependencies
 */*-test
 */*.pdf
+*.o
